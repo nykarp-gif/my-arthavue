@@ -1,0 +1,14 @@
+async function refreshDashboard() {
+    // Ask Python for the Brain V4 result
+    const response = await fetch('/get-data');
+    const data = await response.json();
+
+    // Update the numbers on the screen
+    document.getElementById('live-nifty').innerText = "NIFTY: " + data.price;
+    document.getElementById('main-score').innerText = data.score;
+    document.getElementById('verdict-text').innerText = data.verdict;
+}
+
+// Refresh the data every 60 seconds
+setInterval(refreshDashboard, 60000);
+refreshDashboard();
