@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arthavue — India Investment Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --bg: #f6f5f2;
+            --text: #1c1b18;
+            --accent: #1d5c3a;
+            --border: #dedad2;
+            --font-d: 'Playfair Display', serif;
+            --font-b: 'IBM Plex Sans', sans-serif;
+        }
+        body { background: var(--bg); color: var(--text); font-family: var(--font-b); margin: 0; padding: 0; display: none; } /* Hidden until login */
+        .hdr { background: var(--text); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 54px; color: white; }
+        .logo-name { font-family: var(--font-d); font-size: 20px; font-weight: 600; }
+        .main { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+        .ticker { background: #1c1b18; color: #4caf8a; padding: 10px; font-family: monospace; overflow: hidden; white-space: nowrap; }
+        
+        /* Speedometer Gauge Styling */
+        .gauge-track { width: 100%; height: 30px; background: linear-gradient(to right, #7a1a1a, #7a4f00, #1d5c3a); border-radius: 5px; position: relative; margin: 20px 0; }
+        .needle { position: absolute; top: -10px; width: 4px; height: 50px; background: black; transition: left 1s; }
+    </style>
+</head>
+<body>
+
+    <div class="ticker"><marquee id="ticker-text">Loading Live NSE Data...</marquee></div>
+
+    <header class="hdr">
+        <div class="logo-name">ARTHAVUE</div>
+        <div id="live-nifty" style="font-family: monospace;">NIFTY: --</div>
+    </header>
+
+    <main class="main">
+        <div class="card">
+            <h3>Market Valuation Index</h3>
+            <div class="gauge-track">
+                <div id="gauge-needle" class="needle" style="left: 50%;"></div>
+            </div>
+            <p id="verdict" style="text-align: center; font-weight: bold;">Analyzing Brain V4 Logic...</p>
+        </div>
+
+        <div class="card">
+            <canvas id="indexChart" height="100"></canvas>
+        </div>
+    </main>
+
+    <script>
+        // 1. SIMPLE LOGIN SYSTEM
+        const pass = prompt("Enter Password to Access Arthavue Brain:");
+        if (pass === "1234") { // Change "1234" to whatever you want
+            document.body.style.display = "block";
+        } else {
+            alert("Access Denied");
+            window.location.href = "https://google.com";
+        }
+
+        // 2. FETCH LIVE NSE DATA (FREE)
+        async function updateData() {
+            try {
+                const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/^NSEI'));
+                const json = await response.json();
+                const data = JSON.parse(json.contents);
+                const price = data.chart.result[0].meta.regularMarketPrice;
+                const prevClose = data.chart.result[0].meta.previousClose;
+                
+                document.getElementById('live-nifty').innerText = "NIFTY 50: " + price.toLocaleString();
+                document.getElementById('ticker-text').innerText = "LIVE MARKET DATA: NIFTY at " + price + " | YIELD GAP: NEUTRAL | CYCLE: EARLY RECOVERY";
+
+                // 3. APPLY BRAIN V4 LOGIC (Example: Valuation Zones)
+                // We use Nifty PE logic here (Approx 22k is 'Fair')
+                let needlePos = 50;
+                let verdict = "FAIR";
+                if (price < 19000) { needlePos = 85; verdict = "DEEP VALUE"; }
+                else if (price < 22000) { needlePos = 70; verdict = "ATTRACTIVE"; }
+                else if (price > 25000) { needlePos = 15; verdict = "ELEVATED / EXPENSIVE"; }
+                
+                document.getElementById('gauge-needle').style.left = needlePos + "%";
+                document.getElementById('verdict').innerText = "BRAIN V4 VERDICT: " + verdict;
+
+            } catch (e) {
+                console.log("Data Fetch Error");
+            }
+        }
+
+        updateData();
+        setInterval(updateData, 60000); // Refresh every minute
+    </script>
+</body>
+</html>
